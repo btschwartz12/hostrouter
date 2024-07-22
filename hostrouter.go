@@ -3,6 +3,7 @@ package hostrouter
 import (
 	"net/http"
 	"strings"
+	"net"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -29,6 +30,11 @@ func (hr Routes) Unmap(host string) {
 
 func (hr Routes) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	host := requestHost(r)
+
+  if h, _, err := net.SplitHostPort(host); err == nil {
+		host = h
+	}
+
 	if router, ok := hr[strings.ToLower(host)]; ok {
 		router.ServeHTTP(w, r)
 		return
